@@ -4,7 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ממיר תאריך עברי</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+        body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      padding: 60px 16px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .subtitle {
+      color: #666;
+    }
+
+    input[type="date"],
+    button {
+      font-size: 16px;
+      padding: 8px 12px;
+      margin: 8px;
+    }
+
+    label {
+      display: block;
+      margin: 8px;
+    }
+
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+
+    #result {
+      margin-top: 20px;
+    }
+
+    ul {
+      text-align: right;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+  </style>
 </head>
 <body>
   <main class="card">
@@ -33,31 +96,49 @@
 
     // 3. The main function
     async function convert() {
-      const date = dateInput.value; // e.g. "2026-11-22"
+      const date = dateInput.value;
+      result.className = ''; // reset error color
 
+      // Validation
       if (!date) {
-        result.textContent = 'נא לבחור תאריך';
+        showError('נא לבחור תאריך');
+        return;
+      }
+
+      const year = Number(date.split('-')[0]);
+      if (year < 1900 || year > 2100) {
+        showError('נא לבחור תאריך בין 1900 ל-2100');
         return;
       }
 
       result.textContent = 'טוען...';
+      convertBtn.disabled = true; // prevent double clicks
 
       try {
         let url = `https://www.hebcal.com/converter?cfg=json&date=${date}&g2h=1&lg=he`;
         if (afterSunset.checked) {
           url += '&gs=on';
-        }        const response = await fetch(url);
+        }
 
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error('שגיאת שרת: ' + response.status);
         }
 
         const data = await response.json();
-                showResult(data);
+        showResult(data);
       } catch (error) {
-        result.textContent = 'משהו השתבש: ' + error.message;
+        showError('משהו השתבש: ' + error.message);
+      } finally {
+        convertBtn.disabled = false; // always re-enable
       }
     }
+
+    function showError(message) {
+      result.textContent = message;
+      result.className = 'error';
+    }
+    
      function showResult(data) {
       result.textContent = ''; // clear the previous result
 
