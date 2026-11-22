@@ -21,6 +21,43 @@
     <section id="result"></section>
   </main>
 
-  <script src="script.js"></script>
+  <script>
+        // 1. Find the elements on the page
+    const dateInput = document.getElementById('dateInput');
+    const afterSunset = document.getElementById('afterSunset');
+    const convertBtn = document.getElementById('convertBtn');
+    const result = document.getElementById('result');
+
+    // 2. When the button is clicked, run convert()
+    convertBtn.addEventListener('click', convert);
+
+    // 3. The main function
+    async function convert() {
+      const date = dateInput.value; // e.g. "2026-11-22"
+
+      if (!date) {
+        result.textContent = 'נא לבחור תאריך';
+        return;
+      }
+
+      result.textContent = 'טוען...';
+
+      try {
+        let url = `https://www.hebcal.com/converter?cfg=json&date=${date}&g2h=1`;
+        if (afterSunset.checked) {
+          url += '&gs=on';
+        }        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error('שגיאת שרת: ' + response.status);
+        }
+
+        const data = await response.json();
+                result.textContent = data.hebrew + (data.afterSunset ? ' (אחרי השקיעה)' : '');
+      } catch (error) {
+        result.textContent = 'משהו השתבש: ' + error.message;
+      }
+    }
+  </script>
 </body>
 </html>
