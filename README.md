@@ -10,6 +10,7 @@ A web page that converts a Gregorian date to a Hebrew date using the Hebcal API.
 
 ## How to run
 Open GregToHeb.html in a browser. No installation needed.
+https://omrib787.github.io/GregToHeb/GregToHeb.html
 
 ## API
 Hebcal converter: https://www.hebcal.com/home/219/hebrew-date-converter-rest-api
