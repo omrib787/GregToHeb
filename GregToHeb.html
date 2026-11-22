@@ -43,7 +43,7 @@
       result.textContent = 'טוען...';
 
       try {
-        let url = `https://www.hebcal.com/converter?cfg=json&date=${date}&g2h=1`;
+        let url = `https://www.hebcal.com/converter?cfg=json&date=${date}&g2h=1&lg=he`;
         if (afterSunset.checked) {
           url += '&gs=on';
         }        const response = await fetch(url);
@@ -53,9 +53,30 @@
         }
 
         const data = await response.json();
-                result.textContent = data.hebrew + (data.afterSunset ? ' (אחרי השקיעה)' : '');
+                showResult(data);
       } catch (error) {
         result.textContent = 'משהו השתבש: ' + error.message;
+      }
+    }
+     function showResult(data) {
+      result.textContent = ''; // clear the previous result
+
+      const hebrewDate = document.createElement('h2');
+      hebrewDate.textContent = data.hebrew + (data.afterSunset ? ' (אחרי השקיעה)' : '');
+      result.appendChild(hebrewDate);
+
+      if (data.events && data.events.length > 0) {
+        const title = document.createElement('p');
+        title.textContent = 'מה קורה בתאריך הזה:';
+        result.appendChild(title);
+
+        const list = document.createElement('ul');
+        for (const event of data.events) {
+          const item = document.createElement('li');
+          item.textContent = event;
+          list.appendChild(item);
+        }
+        result.appendChild(list);
       }
     }
   </script>
